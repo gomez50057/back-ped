@@ -6,7 +6,6 @@ class StrategicAxisAdmin(admin.ModelAdmin):
     list_display = ('code', 'name')
     search_fields = ('code', 'name')
     ordering = ('code',)
-    # Los campos ya aparecen en español por verbose_name
 
 @admin.register(UserAxisSelection)
 class UserAxisSelectionAdmin(admin.ModelAdmin):

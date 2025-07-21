@@ -4,26 +4,25 @@ from .models import ObjetivoSet, Objetivo, Estrategia, Linea, FeedbackAvance
 class LineaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Linea
-        fields = ('id', 'text')
+        fields = ('pk', 'clave', 'text')
 
 class EstrategiaSerializer(serializers.ModelSerializer):
-    lineas = LineaSerializer(many=True)
+    lineas = LineaSerializer(many=True, read_only=True)
     class Meta:
         model = Estrategia
-        fields = ('id', 'nombre', 'lineas')
+        fields = ('pk', 'clave', 'nombre', 'lineas')
 
 class ObjetivoSerializer(serializers.ModelSerializer):
-    estrategias = EstrategiaSerializer(many=True)
+    estrategias = EstrategiaSerializer(many=True, read_only=True)
     class Meta:
         model = Objetivo
-        fields = ('id', 'nombre', 'estrategias')
+        fields = ('pk', 'clave', 'nombre', 'estrategias')
 
 class ObjetivoSetSerializer(serializers.ModelSerializer):
-    objetivos = ObjetivoSerializer(many=True)
-
+    objetivos = ObjetivoSerializer(many=True, read_only=True)
     class Meta:
         model = ObjetivoSet
-        fields = ('id', 'objetivos', 'creado', 'actualizado')
+        fields = ('pk', 'id', 'objetivos', 'creado', 'actualizado')
 
 
 class FeedbackAvanceSerializer(serializers.ModelSerializer):

@@ -1,6 +1,4 @@
 from django.shortcuts import render
-
-# Create your views here.
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -12,7 +10,6 @@ class ObjetivoSetView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Devuelve el set del usuario autenticado (o vacío)
         obj_set = getattr(request.user, 'objetivo_set', None)
         if obj_set:
             serializer = ObjetivoSetSerializer(obj_set)
@@ -20,87 +17,87 @@ class ObjetivoSetView(APIView):
         return Response({'detail': 'No hay objetivos para este usuario'}, status=404)
 
     def post(self, request):
-        # Si el usuario ya tiene un set, devuelve error
         if hasattr(request.user, 'objetivo_set'):
             return Response({'detail': 'Ya tienes un conjunto de objetivos, usa PUT para actualizar.'}, status=400)
-        
-        # Crea el set y todos los objetivos/estrategias/líneas enviados
+
         obj_set = ObjetivoSet.objects.create(user=request.user)
         objetivos_data = request.data.get("objetivos", [])
 
         for obj_data in objetivos_data:
             obj = Objetivo.objects.create(
-                id=obj_data["id"],
+                clave=obj_data["clave"],
                 nombre=obj_data["nombre"],
-                set=obj_set
+                set=obj_set,
+                user=request.user
             )
             for est_data in obj_data.get("estrategias", []):
                 est = Estrategia.objects.create(
-                    id=est_data["id"],
+                    clave=est_data["clave"],
                     nombre=est_data["nombre"],
-                    objetivo=obj
+                    objetivo=obj,
+                    user=request.user
                 )
                 for lin_data in est_data.get("lineas", []):
                     Linea.objects.create(
-                        id=lin_data["id"],
+                        clave=lin_data["clave"],
                         text=lin_data["text"],
-                        estrategia=est
+                        estrategia=est,
+                        user=request.user
                     )
         return Response({'detail': 'Cargado correctamente.'}, status=status.HTTP_201_CREATED)
 
     def put(self, request):
-        # Solo actualiza el set del usuario autenticado
         obj_set = getattr(request.user, 'objetivo_set', None)
         if not obj_set:
             return Response({'detail': 'No tienes objetivos aún, usa POST.'}, status=404)
-        
-        # Limpia todos los objetivos, estrategias y líneas previas del set
+
         obj_set.objetivos.all().delete()
 
-        # Vuelve a cargar los datos enviados
         objetivos_data = request.data.get("objetivos", [])
 
         for obj_data in objetivos_data:
             obj = Objetivo.objects.create(
-                id=obj_data["id"],
+                clave=obj_data["clave"],
                 nombre=obj_data["nombre"],
-                set=obj_set
+                set=obj_set,
+                user=request.user
             )
             for est_data in obj_data.get("estrategias", []):
                 est = Estrategia.objects.create(
-                    id=est_data["id"],
+                    clave=est_data["clave"],
                     nombre=est_data["nombre"],
-                    objetivo=obj
+                    objetivo=obj,
+                    user=request.user
                 )
                 for lin_data in est_data.get("lineas", []):
                     Linea.objects.create(
-                        id=lin_data["id"],
+                        clave=lin_data["clave"],
                         text=lin_data["text"],
-                        estrategia=est
+                        estrategia=est,
+                        user=request.user
                     )
         return Response({'detail': 'Actualizado correctamente.'}, status=status.HTTP_200_OK)
-
 
 class ObjetivoDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, objetivo_id):
+    def get(self, request, objetivo_clave):
         obj_set = getattr(request.user, 'objetivo_set', None)
         if not obj_set:
             return Response({'detail': 'No tienes objetivos.'}, status=404)
         try:
-            objetivo = obj_set.objetivos.get(id=objetivo_id)
+            objetivo = obj_set.objetivos.get(clave=objetivo_clave, user=request.user)
         except Objetivo.DoesNotExist:
             return Response({'detail': 'No existe ese objetivo.'}, status=404)
         serializer = ObjetivoSerializer(objetivo)
         return Response(serializer.data)
 
-    def patch(self, request, objetivo_id):
+    def patch(self, request, objetivo_clave):
         obj_set = getattr(request.user, 'objetivo_set', None)
         if not obj_set:
             return Response({'detail': 'No tienes objetivos.'}, status=404)
         try:
-            objetivo = obj_set.objetivos.get(id=objetivo_id)
+            objetivo = obj_set.objetivos.get(clave=objetivo_clave, user=request.user)
         except Objetivo.DoesNotExist:
             return Response({'detail': 'No existe ese objetivo.'}, status=404)
         nombre = request.data.get('nombre')
@@ -111,12 +108,12 @@ class ObjetivoDetailView(APIView):
             return Response(serializer.data)
         return Response({'detail': 'No se proporcionó un nombre.'}, status=400)
 
-    def delete(self, request, objetivo_id):
+    def delete(self, request, objetivo_clave):
         obj_set = getattr(request.user, 'objetivo_set', None)
         if not obj_set:
             return Response({'detail': 'No tienes objetivos.'}, status=404)
         try:
-            objetivo = obj_set.objetivos.get(id=objetivo_id)
+            objetivo = obj_set.objetivos.get(clave=objetivo_clave, user=request.user)
         except Objetivo.DoesNotExist:
             return Response({'detail': 'No existe ese objetivo.'}, status=404)
         objetivo.delete()

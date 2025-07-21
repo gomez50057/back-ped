@@ -12,19 +12,40 @@ class ObjetivoSet(models.Model):
         return f'Objetivos de {self.user.username}'
 
 class Objetivo(models.Model):
-    id = models.CharField(primary_key=True, max_length=32)
-    nombre = models.CharField(max_length=256)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='objetivos')
+    clave = models.CharField(max_length=32, default="temp")  # Cambiado de id → clave
+    nombre = models.CharField(max_length=512)
     set = models.ForeignKey(ObjetivoSet, related_name='objetivos', on_delete=models.CASCADE)
 
+    class Meta:
+        unique_together = ('user', 'clave')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.clave}"
+
 class Estrategia(models.Model):
-    id = models.CharField(primary_key=True, max_length=32)
-    nombre = models.CharField(max_length=256)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='estrategias')
+    clave = models.CharField(max_length=32, default="temp")  # Cambiado de id → clave
+    nombre = models.CharField(max_length=512)
     objetivo = models.ForeignKey(Objetivo, related_name='estrategias', on_delete=models.CASCADE)
 
+    class Meta:
+        unique_together = ('user', 'clave')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.clave}"
+
 class Linea(models.Model):
-    id = models.CharField(primary_key=True, max_length=32)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='lineas')
+    clave = models.CharField(max_length=32, default="temp")  # Cambiado de id → clave
     text = models.TextField()
     estrategia = models.ForeignKey(Estrategia, related_name='lineas', on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'clave')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.clave}"
 
 
 class FeedbackAvance(models.Model):
