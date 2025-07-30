@@ -46,9 +46,5 @@ from .models import IndicadoresFeedback
 from .serializers import IndicadoresFeedbackSerializerFull
 
 class IndicadoresFeedbackListAPIViewFull(generics.ListAPIView):
-    """
-    GET /api/indicadores-feedback/
-    Devuelve la lista completa de IndicadoresFeedback (Full)
-    """
     queryset = IndicadoresFeedback.objects.all().order_by('-created_at')
     serializer_class = IndicadoresFeedbackSerializerFull

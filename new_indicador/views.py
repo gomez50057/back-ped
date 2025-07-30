@@ -41,3 +41,13 @@ class NewIndicadorProposalDetailView(UserQuerySetMixin, generics.RetrieveUpdateD
     serializer_class = NewIndicadorProposalSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'indicador'
+
+
+# views.py
+from rest_framework import generics, permissions
+from .models import NewIndicadorProposal
+from .serializers import NewIndicadorProposalSerializerFull
+
+class NewIndicadorProposalListAPIViewFull(generics.ListAPIView):
+    queryset = NewIndicadorProposal.objects.all().order_by('-created_at')
+    serializer_class = NewIndicadorProposalSerializerFull
