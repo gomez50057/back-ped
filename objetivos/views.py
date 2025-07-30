@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import ObjetivoSet, Objetivo, Estrategia, Linea
 from .serializers import ObjetivoSetSerializer, ObjetivoSerializer
+from rest_framework import serializers
 
 class ObjetivoSetView(APIView):
     permission_classes = [IsAuthenticated]
@@ -119,10 +120,6 @@ class ObjetivoDetailView(APIView):
         objetivo.delete()
         return Response({'detail': 'Objetivo eliminado.'}, status=204)
 
-
-from rest_framework import serializers
-from .models import Objetivo, Estrategia, Linea
-
 class LineaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Linea
@@ -206,3 +203,99 @@ class UserFeedbackAvanceView(generics.ListCreateAPIView):
         if errors:
             return Response({'errors': errors, 'results': results}, status=status.HTTP_400_BAD_REQUEST)
         return Response(results, status=status.HTTP_200_OK)
+
+
+# # objetivos/views.py
+# from django.contrib.auth import get_user_model
+# from rest_framework import viewsets, permissions
+# from .models import ObjetivoSet, FeedbackAvance
+# from .serializers import ObjetivoSetSerializer, FeedbackAvanceSerializer
+
+# User = get_user_model()
+
+# class IsRevisionUser(permissions.BasePermission):
+#     """
+#     Solo permiten acceso a usuarios en el grupo 'revision'.
+#     """
+#     def has_permission(self, request, view):
+#         return (
+#             request.user.is_authenticated and
+#             request.user.groups.filter(name='revision').exists()
+#         )
+
+# class ObjetivoSetViewSet(viewsets.ReadOnlyModelViewSet):
+#     """
+#     - Usuarios normales: solo ven su propio ObjetivoSet.
+#     - Usuarios 'revision': ven todos los ObjetivoSet.
+#     """
+#     queryset = ObjetivoSet.objects.all()
+#     serializer_class = ObjetivoSetSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def get_queryset(self):
+#         qs = super().get_queryset()
+#         if not self.request.user.groups.filter(name='revision').exists():
+#             qs = qs.filter(user=self.request.user)
+#         return qs
+
+# class FeedbackAvanceViewSet(viewsets.ReadOnlyModelViewSet):
+#     """
+#     - Usuarios normales: solo ven su propio FeedbackAvance.
+#     - Usuarios 'revision': ven todo el FeedbackAvance.
+#     """
+#     queryset = FeedbackAvance.objects.all()
+#     serializer_class = FeedbackAvanceSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def get_queryset(self):
+#         qs = super().get_queryset()
+#         if not self.request.user.groups.filter(name='revision').exists():
+#             qs = qs.filter(user=self.request.user)
+#         return qs
+
+
+#
+#
+
+from rest_framework.generics import ListAPIView
+from .models import ObjetivoSet, Objetivo, Estrategia, Linea
+from .serializers import (
+    ObjetivoSetSerializerFull,
+    ObjetivoSerializerFull,
+    EstrategiaSerializerFull,
+    LineaSerializerFull
+)
+from rest_framework.permissions import AllowAny
+
+class AllObjetivoSetView(ListAPIView):
+    queryset = ObjetivoSet.objects.all()
+    serializer_class = ObjetivoSetSerializerFull
+    permission_classes = [AllowAny]
+
+class AllObjetivoView(ListAPIView):
+    queryset = Objetivo.objects.all()
+    serializer_class = ObjetivoSerializerFull
+    permission_classes = [AllowAny]
+
+class AllEstrategiaView(ListAPIView):
+    queryset = Estrategia.objects.all()
+    serializer_class = EstrategiaSerializerFull
+    permission_classes = [AllowAny]
+
+class AllLineaView(ListAPIView):
+    queryset = Linea.objects.all()
+    serializer_class = LineaSerializerFull
+    permission_classes = [AllowAny]
+    
+#
+#
+#
+from rest_framework.generics import ListAPIView
+from .models import FeedbackAvance
+from .serializers import FeedbackAvanceSerializerFull
+from rest_framework.permissions import AllowAny
+
+class AllFeedbackAvanceView(ListAPIView):
+    queryset = FeedbackAvance.objects.all()
+    serializer_class = FeedbackAvanceSerializerFull
+    permission_classes = [AllowAny]

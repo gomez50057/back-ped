@@ -1,16 +1,19 @@
 from django.contrib import admin
 from .models import ObjetivoSet, Objetivo, Estrategia, Linea, FeedbackAvance
+from reviews_estrategias.admin import CampoReviewInline
 
 # Inlines jerárquicos
-class LineaInline(admin.TabularInline):
+tf_class = admin.TabularInline  # alias para brevedad
+
+class LineaInline(tf_class):
     model = Linea
     extra = 1
 
-class EstrategiaInline(admin.TabularInline):
+class EstrategiaInline(tf_class):
     model = Estrategia
     extra = 1
 
-class ObjetivoInline(admin.TabularInline):
+class ObjetivoInline(tf_class):
     model = Objetivo
     extra = 1
 
@@ -18,7 +21,7 @@ class ObjetivoInline(admin.TabularInline):
 class ObjetivoSetAdmin(admin.ModelAdmin):
     list_display = ('user', 'get_objetivos', 'creado', 'actualizado')
     search_fields = ('user__username',)
-    inlines = [ObjetivoInline]
+    inlines = [ObjetivoInline, CampoReviewInline]
 
     def get_objetivos(self, obj):
         return ", ".join(o.nombre for o in obj.objetivos.all())
@@ -29,22 +32,21 @@ class ObjetivoAdmin(admin.ModelAdmin):
     list_display = ('id', 'nombre', 'set')
     list_filter = ('set',)
     search_fields = ('id', 'nombre')
-    inlines = [EstrategiaInline]
+    inlines = [EstrategiaInline, CampoReviewInline]
 
 @admin.register(Estrategia)
 class EstrategiaAdmin(admin.ModelAdmin):
     list_display = ('id', 'nombre', 'objetivo')
     list_filter = ('objetivo',)
     search_fields = ('id', 'nombre')
-    inlines = [LineaInline]
+    inlines = [LineaInline, CampoReviewInline]
 
 @admin.register(Linea)
 class LineaAdmin(admin.ModelAdmin):
     list_display = ('id', 'text', 'estrategia')
     list_filter = ('estrategia',)
     search_fields = ('id', 'text')
-
-
+    inlines = [CampoReviewInline]
 
 @admin.register(FeedbackAvance)
 class FeedbackAvanceAdmin(admin.ModelAdmin):
@@ -52,4 +54,4 @@ class FeedbackAvanceAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'clave']
     readonly_fields = ['created', 'updated']
     list_filter = ['acuerdo', 'envio_final']
-
+    inlines = [CampoReviewInline]

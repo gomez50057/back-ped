@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'indicadores_eleccion',
     'indicadores_feedback',
     'new_indicador',
+    'reviews_estrategias',
 
     'django.contrib.contenttypes',
     'django.contrib.sessions',

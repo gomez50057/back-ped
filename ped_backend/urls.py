@@ -13,6 +13,7 @@ urlpatterns = [
     path('api/indicadores/', include('indicadores_eleccion.urls')),
     path('api/indicadores-feedback/', include('indicadores_feedback.urls')),  
     path('api/indicador/', include('new_indicador.urls')),
+    path('api/', include('reviews_estrategias.urls')),
 ]
 
 if settings.DEBUG:
