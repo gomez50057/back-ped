@@ -15,3 +15,12 @@ class ElementoViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+# otro_apartados/views.py
+from rest_framework import generics, permissions
+from .models import Elemento
+from .serializers import ElementoSerializerFull
+
+class ElementoListAPIViewFull(generics.ListAPIView):
+    queryset = Elemento.objects.all().order_by('-fecha_creacion')
+    serializer_class = ElementoSerializerFull
