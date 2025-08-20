@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 class Elemento(models.Model):
     envio_final = models.BooleanField(default=False)
-    asIs = models.CharField(max_length=255)
+    asIs = models.CharField(max_length=1500)
     justification = models.TextField()
     page = models.CharField(max_length=10)
     sectionName = models.CharField(max_length=255)
